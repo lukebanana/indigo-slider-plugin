@@ -1,10 +1,10 @@
 <?php
 /**
  * Plugin Name: Indigo Slider
- * Description: A Slider based on Slick.
+ * Description: A Slider based on Slick. Depends on ACF Pro
  * Author: Lukas Abegg
  * Author URI: http://www.farner.ch
- * Version: 0.1.2
+ * Version: 0.1.5
  * Date: 01/02/16
  */
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );

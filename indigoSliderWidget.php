@@ -2,7 +2,7 @@
 
 /**
  * User: lua
- * Date: 02/02/16
+ * Date: 04/02/16
  */
 
 class IndigoSliderWidget extends WP_Widget{
@@ -158,7 +158,7 @@ class IndigoSliderWidget extends WP_Widget{
 
 
          <p class='hide' data-parent-trigger='<?php echo $this->get_field_id('arrows'); ?>'>
-            <label for='<?php echo $this->get_field_id( 'nextArrowClasses' ); ?>'><?php _e("Next Arrow HTML"); ?></label>
+            <label for='<?php echo $this->get_field_id( 'nextArrowClasses' ); ?>'><?php _e("Next Arrow CSS-Classes"); ?></label>
             <input class='widefat' id="<?php echo $this->get_field_id( 'nextArrow' ); ?>"
                    name='<?php echo $this->get_field_name( 'nextArrowClasses' ); ?>'
                    type='text'
@@ -167,7 +167,7 @@ class IndigoSliderWidget extends WP_Widget{
 
 
          <p class='hide' data-parent-trigger='<?php echo $this->get_field_id('arrows'); ?>'>
-            <label for='<?php echo $this->get_field_id( 'prevArrowClasses' ); ?>'><?php _e("Prev Arrow HTML"); ?></label>
+            <label for='<?php echo $this->get_field_id( 'prevArrowClasses' ); ?>'><?php _e("Prev Arrow CSS-Classes"); ?></label>
             <input class='widefat' id="<?php echo $this->get_field_id( 'prevArrowClasses' ); ?>"
                    name='<?php echo $this->get_field_name( 'prevArrowClasses' ); ?>'
                    type='text'

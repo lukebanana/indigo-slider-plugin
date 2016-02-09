@@ -10,14 +10,6 @@ class IndigoSliderWidget extends WP_Widget{
    private $jsFolderName = "js";
    private $slickFolderName = "slick";
 
-   private $defaultValueImgSize = "medium";
-   private $defaultValueFieldName = "slider-gallery";
-   private $defaultValueAutoplaySpeed = 3000;
-   private $defaultValueSlidesToShow = 1;
-   private $defaultValueSlidesToScroll = 1;
-   private $defaultValueArrowPrev = "arrow slick-prev icon-arrow-left";
-   private $defaultValueArrowNext = "arrow slick-next icon-arrow-right";
-
    function __construct(){
       $params = array(
          'descriptions' => 'A Slider based on Slick.',
@@ -38,6 +30,22 @@ class IndigoSliderWidget extends WP_Widget{
 
       $this->loadBackendJS();
 
+      $defaults = array(
+         'isRepeater' => false,
+         'autoplay' => false,
+         'centerMode' => false,
+         'centerPadding' => '50px',
+         'fieldName' => 'slider-gallery',
+         'imgSize' => 'medium',
+         'arrows' => true,
+         'prevArrowClasses' => 'arrow slick-prev icon-arrow-left',
+         'nextArrowClasses' => 'arrow slick-next icon-arrow-right',
+         'slidesToShow' => 1,
+         'slidesToScroll' => 1,
+         'autoplay-speed' => '3000',
+      );
+      $instance = wp_parse_args( (array) $instance, $defaults );
+
       ?>
 
       <div class="indigo-settings">
@@ -46,7 +54,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox trigger"
                    name="<?php echo $this->get_field_name('isRepeater'); ?>"
                    type="checkbox"
-               <?php checked( $instance[ 'isRepeater' ], 'on' ); ?>>
+               <?php checked( (bool)$instance[ 'isRepeater' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('isRepeater'); ?>"><?php _e("Repeater"); ?></label>
          </p>
 
@@ -55,7 +63,7 @@ class IndigoSliderWidget extends WP_Widget{
             <input class="widefat"
                    id="<?php echo $this->get_field_id( 'postID' ); ?>"
                    name="<?php echo $this->get_field_name( 'postID' ); ?>"
-                   type="text"
+                   type="number"
                    placeholder="1"
                    value="<?php echo esc_attr( $instance['postID'] ); ?>" />
          </p>
@@ -66,7 +74,7 @@ class IndigoSliderWidget extends WP_Widget{
                    id="<?php echo $this->get_field_id( 'fieldName' ); ?>"
                    name="<?php echo $this->get_field_name( 'fieldName' ); ?>"
                    type="text"
-                   value="<?php echo ( empty($instance['fieldName']) ? $this->defaultValueFieldName : esc_attr( $instance['fieldName'] ) ); ?>" />
+                   value="<?php echo esc_attr( $instance['fieldName'] ); ?>" />
          </p>
 
          <p class="hide" data-parent-trigger="<?php echo $this->get_field_id('isRepeater'); ?>">
@@ -101,7 +109,7 @@ class IndigoSliderWidget extends WP_Widget{
             <input class="widefat" id="<?php echo $this->get_field_id( 'imgSize' ); ?>"
                    name="<?php echo $this->get_field_name( 'imgSize' ); ?>"
                    type="text"
-                   value="<?php echo ( empty($instance['imgSize']) ? $this->defaultValueImgSize : esc_attr( $instance['imgSize'] ) ); ?>" />
+                   value="<?php echo esc_attr( $instance['imgSize'] ); ?>" />
          </p>
 
          <p>
@@ -116,7 +124,7 @@ class IndigoSliderWidget extends WP_Widget{
             <label for="<?php echo $this->get_field_id( 'speed' ); ?>"><?php _e("Slide/Fade animation speed (ms)"); ?></label>
             <input class="widefat" id="<?php echo $this->get_field_id( 'speed' ); ?>"
                    name="<?php echo $this->get_field_name( 'speed' ); ?>"
-                   type="text"
+                   type="number"
                    value="<?php echo ( empty($instance['speed']) ? '300' : esc_attr( $instance['speed'] ) ); ?>" />
          </p>
 
@@ -125,7 +133,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('fade'); ?>"
                    type="checkbox"
-                   <?php checked( $instance[ 'fade' ], 'on' ); ?>>
+                   <?php checked( (bool)$instance[ 'fade' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('fade'); ?>"><?php _e("Fade"); ?></label>
          </p>
 
@@ -134,8 +142,25 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('adaptiveHeight'); ?>"
                    type="checkbox"
-                   <?php checked( $instance[ 'adaptiveHeight' ], 'on' ); ?>>
+                   <?php checked( (bool)$instance[ 'adaptiveHeight' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('adaptiveHeight'); ?>"><?php _e("Adaptive Height"); ?></label>
+         </p>
+
+         <p>
+            <input id="<?php echo $this->get_field_id('centerMode'); ?>"
+                   class="checkbox trigger"
+                   name="<?php echo $this->get_field_name('centerMode'); ?>"
+                   type="checkbox"
+                   <?php checked( (bool)$instance[ 'centerMode' ], true ); ?>>
+            <label for="<?php echo $this->get_field_id('centerMode'); ?>"><?php _e("Center Mode"); ?></label>
+         </p>
+
+         <p class='hide' data-parent-trigger='<?php echo $this->get_field_id('centerMode'); ?>'>
+            <label for='<?php echo $this->get_field_id( 'centerPadding' ); ?>'><?php _e("Side padding for center mode (px or %)"); ?></label>
+            <input class='widefat' id="<?php echo $this->get_field_id( 'centerPadding' ); ?>"
+                   name='<?php echo $this->get_field_name( 'centerPadding' ); ?>'
+                   type='text'
+                   value='<?php echo esc_attr( $instance['centerPadding'] ); ?>' />
          </p>
 
          <p>
@@ -143,7 +168,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('dots'); ?>"
                    type="checkbox"
-                   <?php checked( $instance[ 'dots' ], 'on' ); ?>>
+                   <?php checked( (bool)$instance[ 'dots' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('dots'); ?>"><?php _e("Show dot indicators"); ?></label>
          </p>
 
@@ -152,17 +177,17 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox trigger"
                    name="<?php echo $this->get_field_name('arrows'); ?>"
                    type="checkbox"
-                   <?php checked( $instance[ 'arrows' ], 'on' ); ?>>
+                   <?php checked( (bool)$instance[ 'arrows' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('arrows'); ?>"><?php _e("Show arrows"); ?></label>
          </p>
 
 
          <p class='hide' data-parent-trigger='<?php echo $this->get_field_id('arrows'); ?>'>
             <label for='<?php echo $this->get_field_id( 'nextArrowClasses' ); ?>'><?php _e("Next Arrow CSS-Classes"); ?></label>
-            <input class='widefat' id="<?php echo $this->get_field_id( 'nextArrow' ); ?>"
+            <input class='widefat' id="<?php echo $this->get_field_id( 'nextArrowClasses' ); ?>"
                    name='<?php echo $this->get_field_name( 'nextArrowClasses' ); ?>'
                    type='text'
-                   value='<?php echo ( empty($instance['nextArrowClasses']) ? $this->defaultValueArrowNext : esc_attr( $instance['nextArrowClasses'] ) ); ?>' />
+                   value='<?php echo esc_attr( $instance['nextArrowClasses'] ); ?>' />
          </p>
 
 
@@ -171,15 +196,7 @@ class IndigoSliderWidget extends WP_Widget{
             <input class='widefat' id="<?php echo $this->get_field_id( 'prevArrowClasses' ); ?>"
                    name='<?php echo $this->get_field_name( 'prevArrowClasses' ); ?>'
                    type='text'
-                   value='<?php echo ( empty($instance['prevArrowClasses']) ? $this->defaultValueArrowPrev : esc_attr( $instance['prevArrowClasses'] ) ); ?>' />
-         </p>
-
-         <p>
-            <label for="<?php echo $this->get_field_id( 'speed' ); ?>"><?php _e("Slide/Fade animation speed (ms)"); ?></label>
-            <input class="widefat" id="<?php echo $this->get_field_id( 'speed' ); ?>"
-                   name="<?php echo $this->get_field_name( 'speed' ); ?>"
-                   type="text"
-                   value="<?php echo ( empty($instance['speed']) ? '300' : esc_attr( $instance['speed'] ) ); ?>" />
+                   value='<?php echo esc_attr( $instance['prevArrowClasses'] ); ?>' />
          </p>
 
          <p>
@@ -187,7 +204,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('draggable'); ?>"
                    type="checkbox"
-                   <?php checked( $instance[ 'draggable' ], 'on' ); ?>>
+                   <?php checked( (bool)$instance[ 'draggable' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('draggable'); ?>"><?php _e("Enable mouse dragging"); ?></label>
          </p>
 
@@ -196,7 +213,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('infinite'); ?>"
                    type="checkbox"
-               <?php checked( $instance[ 'infinite' ], 'on' ); ?>>
+               <?php checked( (bool)$instance[ 'infinite' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('infinite'); ?>"><?php _e("Infinite"); ?></label>
          </p>
 
@@ -205,7 +222,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox trigger"
                    name="<?php echo $this->get_field_name('autoplay'); ?>"
                    type="checkbox"
-               <?php checked( $instance[ 'autoplay' ], 'on' ); ?>>
+               <?php checked( (bool)$instance[ 'autoplay' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('autoplay'); ?>"><?php _e("Enable autoplay"); ?></label>
          </p>
 
@@ -214,7 +231,7 @@ class IndigoSliderWidget extends WP_Widget{
                    class="checkbox"
                    name="<?php echo $this->get_field_name('pauseOnHover'); ?>"
                    type="checkbox"
-               <?php checked( $instance[ 'pauseOnHover' ], 'on' ); ?>>
+               <?php checked( (bool)$instance[ 'pauseOnHover' ], true ); ?>>
             <label for="<?php echo $this->get_field_id('pauseOnHover'); ?>"><?php _e("Pause Autoplay On Hover"); ?></label>
          </p>
 
@@ -223,16 +240,16 @@ class IndigoSliderWidget extends WP_Widget{
             <input class="widefat"
                    id="<?php echo $this->get_field_id( 'autoplay-speed' ); ?>"
                    name="<?php echo $this->get_field_name( 'autoplay-speed' ); ?>"
-                   type="text"
-                   value="<?php echo ( empty($instance['autoplay-speed']) ? $this->defaultValueAutoplaySpeed : esc_attr( $instance['autoplay-speed'] ) ); ?>" />
+                   type="number"
+                   value="<?php echo esc_attr( $instance['autoplay-speed'] ); ?>" />
          </p>
          <p>
             <label for="<?php echo $this->get_field_id( 'slidesToShow' ); ?>"><?php _e("Slides to show"); ?></label>
             <input class="widefat"
                    id="<?php echo $this->get_field_id( 'slidesToShow' ); ?>"
                    name="<?php echo $this->get_field_name( 'slidesToShow' ); ?>"
-                   type="text"
-                   value="<?php echo ( empty($instance['slidesToShow']) ? $this->defaultValueSlidesToShow : esc_attr( $instance['slidesToShow'] ) ); ?>" />
+                   type="number"
+                   value="<?php echo esc_attr( $instance['slidesToShow'] ); ?>" />
          </p>
 
          <p>
@@ -240,8 +257,8 @@ class IndigoSliderWidget extends WP_Widget{
             <input class="widefat"
                    id="<?php echo $this->get_field_id( 'slidesToScroll' ); ?>"
                    name="<?php echo $this->get_field_name( 'slidesToScroll' ); ?>"
-                   type="text"
-                   value="<?php echo ( empty($instance['slidesToScroll']) ? $this->defaultValueSlidesToScroll : esc_attr( $instance['slidesToScroll'] ) ); ?>" />
+                   type="number"
+                   value="<?php echo esc_attr( $instance['slidesToScroll'] ); ?>" />
          </p>
 
          <p>
@@ -274,6 +291,7 @@ class IndigoSliderWidget extends WP_Widget{
       $autoplay = $instance[ 'autoplay' ] ? 'true' : 'false';
       $pauseOnHover = $instance[ 'pauseOnHover' ] ? 'true' : 'false';
       $infinite = $instance[ 'infinite' ] ? 'true' : 'false';
+      $centerMode = $instance[ 'centerMode' ] ? 'true' : 'false';
       $adaptiveHeight = $instance[ 'adaptiveHeight' ] ? 'true' : 'false';
 
 
@@ -297,6 +315,8 @@ class IndigoSliderWidget extends WP_Widget{
                   "arrows": <?php echo $arrows; ?>,
                   "prevArrow": "<button type=\"button\" class=\"<?php echo $instance['prevArrowClasses']; ?>\"></button>",
                   "nextArrow": "<button type=\"button\" class=\"<?php echo $instance['nextArrowClasses']; ?>\"></button>",
+                  "centerMode": <?php echo $centerMode; ?>,
+                  "centerPadding": <?php echo $instance['centerPadding']; ?>,
                   "adaptiveHeight": <?php echo $adaptiveHeight; ?>,
                   "speed": <?php echo $instance['speed'] ?>,
                   "slidesToShow": <?php echo $instance['slidesToShow'] ?>,
@@ -344,20 +364,23 @@ class IndigoSliderWidget extends WP_Widget{
     * @param array $old_instance The previous options
     */
    public function update( $new_instance, $old_instance ) {
-
-      /*
+/*
       file_put_contents(dirname(__FILE__).'/debug.txt', print_r($old_instance, true));
       file_put_contents(dirname(__FILE__).'/debug.txt', print_r($new_instance, true), FILE_APPEND);
-      */
+*/
 
       // processes widget options to be saved here
+      $instance = $new_instance;
 
-      return $new_instance;
+      // Use this to override the default values
+      $instance['arrows'] = $new_instance['arrows'];
+
+      return $instance;
    }
 
 
    /**
-    * loads necessary JS for slick
+    * loads necessary CSS for slick
     */
    private function loadCSS(){
       wp_enqueue_style('slick-css', plugins_url( ($this->slickFolderName .'/slick.css'), __FILE__ ));
@@ -378,6 +401,9 @@ class IndigoSliderWidget extends WP_Widget{
       wp_enqueue_script('indigoSlider-js');
    }
 
+   /**
+    * loads necessary Backend JS for widget
+    */
    private function loadBackendJS(){
       wp_register_script('indigoSlider-backend-js', plugins_url( ($this->jsFolderName .'/indigo-slider-backend.js'), __FILE__ ), array( 'jquery') );
       wp_enqueue_script('indigoSlider-backend-js');
